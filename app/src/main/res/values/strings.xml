@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">AppInter</string>
+    <string name="login_username">Nombre de usuario</string>
+    <string name="login_password">Contraseña</string>
+    <string name="welcome_text">Bienvenido</string>
+    <string name="login_btn">Ingresar</string>
+    <string name="btn_ingresar">Ingresar</string>
+    <string name="channel_name">CHANNEL_ID_APP</string>
+    <string name="channel_description">DESCRIPCION_CHANNEL_ID</string>
+</resources>
