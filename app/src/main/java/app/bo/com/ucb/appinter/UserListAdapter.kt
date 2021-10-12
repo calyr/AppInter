@@ -19,7 +19,6 @@ class UserListAdapter(val list: ArrayList<User>, val context: Context) : Recycle
         val item = list.get(position)
         holder.itemView.findViewById<TextView>(R.id.user_name_text_view).text = item.name
         holder.itemView.findViewById<TextView>(R.id.user_email_text_view).text = item.email
-
     }
 
     override fun getItemCount(): Int {

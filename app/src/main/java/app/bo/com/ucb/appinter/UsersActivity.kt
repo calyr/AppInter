@@ -91,7 +91,7 @@ class UsersActivity : AppCompatActivity() {
         }
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.notification_bg)
-                .setContentTitle("Clase 3")
+                .setContentTitle("ucb")
                 .setContentText("Notificaciones Internas")
                 .setSound(sonido)
                 .setAutoCancel(true)
