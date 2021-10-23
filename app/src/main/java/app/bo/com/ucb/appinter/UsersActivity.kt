@@ -7,10 +7,19 @@ import android.media.RingtoneManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import app.bo.com.ucb.appinter.modeldb.Book
+import com.google.gson.Gson
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class UsersActivity : AppCompatActivity() {
 
@@ -19,49 +28,76 @@ class UsersActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_users)
 
-        val list = arrayListOf<User>(
-            User("name1", "email1"),
-            User("name2", "email2"),
-            User("name3", "email3"),
-            User("name4", "email4"),
-            User("name5", "email5"),
-            User("name6", "email6"),
-            User("name7", "email7"),
-            User("name8", "email8"),
-            User("name1", "email1"),
-            User("name2", "email2"),
-            User("name3", "email3"),
-            User("name4", "email4"),
-            User("name5", "email5"),
-            User("name6", "email6"),
-            User("name7", "email7"),
-            User("name8", "email8"),
-            User("name1", "email1"),
-            User("name2", "email2"),
-            User("name3", "email3"),
-            User("name4", "email4"),
-            User("name5", "email5"),
-            User("name6", "email6"),
-            User("name7", "email7"),
-            User("name8", "email8"),
-            User("name1", "email1"),
-            User("name2", "email2"),
-            User("name3", "email3"),
-            User("name4", "email4"),
-            User("name5", "email5"),
-            User("name6", "email6"),
-            User("name7", "email7"),
-            User("name8", "email8"),
-            User("name1", "email1"),
-            User("name2", "email2"),
-            User("name3", "email3"),
-            User("name4", "email4"),
-            User("name5", "email5"),
-            User("name6", "email6"),
-            User("name7", "email7"),
-            User("name8", "email8"),
+        //
+        val bookDao = AppRoomDatabase.getDatabase(applicationContext)
+            .bookDao()
+        val repository = BookRepository(bookDao)
 
-        )
+        GlobalScope.launch {
+            repository.insert(Book("Android I"))
+            repository.insert(Book("Android II"))
+            repository.insert(Book("Android III"))
+
+            val listDb = repository.getListBook()
+
+            listDb.forEach {
+                Log.d("DB", it.title)
+            }
+
+        }
+
+
+
+
+        //
+
+
+        val list = arrayListOf<User>() //recyclerView 1
+
+        val restApiAdapter = RestApiAdapter()
+        val endPointApi = restApiAdapter.connectionApi()
+        val bookResponse = endPointApi.getAllPost()
+
+        bookResponse.enqueue( object : Callback<List<Post>> {
+            override fun onFailure(call: Call<List<Post>>, t: Throwable) {
+                t?.printStackTrace()
+            }
+
+            override fun onResponse(call: Call<List<Post>>, response: Response<List<Post>>) {
+                val posts = response.body()
+                posts?.forEach {
+                    //Log.d("Resp", Gson().toJson(it) )
+                    Log.d("RESP ID", it.id.toString())
+                    val resp = Gson().toJson(it.id)
+                    //list.add(User(it.title, it.body))                                  ////recyclerView 2
+                }
+                //recyclerViewUser.adapter = UserListAdapter(list, applicationContext) //recyclerView 3
+            }
+        })
+
+Toast.makeText(applicationContext, "TEST", Toast.LENGTH_LONG).show()
+        val userResponse = endPointApi.getUsers()
+        userResponse.enqueue( object : Callback<List<User>> {
+            override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
+                val userList = response.body()
+
+                userList?.forEach {
+                    Log.d("USER", it.email)
+                    list.add(it)
+                }
+                recyclerViewUser.adapter = UserListAdapter(list, applicationContext)
+
+            }
+
+            override fun onFailure(call: Call<List<User>>, t: Throwable) {
+                t?.printStackTrace()
+            }
+
+        })
+
+
+
+
 
         val linearLayoutManager = LinearLayoutManager(this)
 //        val gridLayoutManager = GridLayoutManager(this, 2)
@@ -71,7 +107,7 @@ class UsersActivity : AppCompatActivity() {
 //        recyclerViewUser.layoutManager = gridLayoutManager
         recyclerViewUser.layoutManager = linearLayoutManager
 
-        recyclerViewUser.adapter = UserListAdapter(list, this)
+        //recyclerViewUser.adapter = UserListAdapter(list, this)
 
 
         val sonido = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
